@@ -1,0 +1,66 @@
+import random
+import pygame
+
+# Define color for each block value
+color_list = {
+    2: (255, 255, 255),
+    4: (143, 143, 143),
+    8: (255, 250, 50),
+    16: (255, 100, 90),
+    32: (255, 15, 0),
+    64: (255, 0, 230),
+    128: (0, 255, 0),
+    256: (0, 80, 0),
+    512: (169, 252, 212),
+    1024: (0, 255, 221),
+    2048: (0, 0, 255),
+    4096: (255, 100, 0)
+}
+
+class Block:
+    def __init__(self, x, y, number):
+        self.size = 86
+        self.x = x
+        self.y = y
+        self.number = number
+        self.color = color_list.get(number, (130, 106, 90))
+
+    def create_block(self):
+        pygame.draw.rect(screen, self.color, pygame.Rect(
+            442 + (self.x * 89), 162 + (self.y * 89), self.size, self.size
+        ))
+
+def spawn_block():
+    x = random.randint(0, 3)
+    y = random.randint(0, 3)
+    num = 4 if random.randint(1, 10) == 10 else 2
+    create_blk = Block(x, y, num)
+    create_blk.create_block()
+    print("Block spawned at ({}, {}) with value {}".format(x, y, num))
+
+def draw_board():
+    pygame.draw.rect(screen, (200, 200, 200), pygame.Rect(440, 160, 356, 356))
+    for x in range(440, 790, 89):
+        for y in range(160, 510, 89):
+            pygame.draw.rect(screen, (75, 75, 75), pygame.Rect(x, y, 90, 90), 2)
+
+pygame.init()
+screen = pygame.display.set_mode((1280, 720))
+pygame.display.set_caption("2048 - NO NN")
+clock = pygame.time.Clock()
+screen.fill("grey")
+draw_board()
+
+running = True
+while running:
+    clock.tick(60)
+    pygame.display.flip()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_w]:
+        spawn_block()
+        pygame.time.wait(250)
+
+pygame.quit()
