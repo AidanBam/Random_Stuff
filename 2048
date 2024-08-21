@@ -1,7 +1,6 @@
 import random
 import pygame
 
-# Define color for each block value
 color_list = {
     2: (255, 255, 255),
     4: (143, 143, 143),
@@ -17,26 +16,95 @@ color_list = {
     4096: (255, 100, 0)
 }
 
+cord_list = {
+    (1, 1): False,
+    (1, 2): False,
+    (1, 3): False,
+    (1, 4): False,
+    (2, 1): False,
+    (2, 2): False,
+    (2, 3): False,
+    (2, 4): False,
+    (3, 1): False,
+    (3, 2): False,
+    (3, 3): False,
+    (3, 4): False,
+    (4, 1): False,
+    (4, 2): False,
+    (4, 3): False,
+    (4, 4): False
+}
+
 class Block:
-    def __init__(self, x, y, number):
+    def __init__(self, number, location):
         self.size = 86
-        self.x = x
-        self.y = y
         self.number = number
-        self.color = color_list.get(number, (130, 106, 90))
+        self.location = location
+        self.color = color_list.get(number)
 
     def create_block(self):
         pygame.draw.rect(screen, self.color, pygame.Rect(
-            442 + (self.x * 89), 162 + (self.y * 89), self.size, self.size
+            442 + ((self.location[0] - 1) * 89), 162 + ((self.location[1] - 1) * 89), self.size, self.size
         ))
+    def move(self, x_change, y_change):
+        try:
+            if not cord_list[self.location[0] + x_change, self.location[1] + y_change]:
+                place_holder = cord_list[self.location]
+                cord_list[self.location] = False
+                self.location = (self.location[0] + x_change, self.location[1] + y_change)
+                cord_list[self.location] = place_holder
+            elif cord_list[self.location[0] + x_change, self.location[1] + y_change].number == self.number:
+                self.number += self.number
+                place_holder = cord_list[self.location]
+                self.color = color_list.get(self.number)
+                cord_list[self.location[0], self.location[1]] = place_holder
+                cord_list[self.location[0] + x_change, self.location[1] + y_change] = False
+        except:
+            pass
+
+
 
 def spawn_block():
-    x = random.randint(0, 3)
-    y = random.randint(0, 3)
-    num = 4 if random.randint(1, 10) == 10 else 2
-    create_blk = Block(x, y, num)
-    create_blk.create_block()
-    print("Block spawned at ({}, {}) with value {}".format(x, y, num))
+    finding_location = True
+    while finding_location:
+        if False in cord_list.values():
+            x = random.randint(1, 4)
+            y = random.randint(1, 4)
+            if not cord_list[x, y]:
+                num = 4 if random.randint(1, 10) == 10 else 2
+                create_blk = Block(num, (x,y))
+                create_blk.create_block()
+                cord_list[x, y] = create_blk
+                finding_location = False
+            else:
+                pass
+        else:
+            global running
+            pygame.time.wait(3000)
+            screen.fill("black")
+            pygame.display.update()
+            pygame.time.wait(300)
+            running = False
+            finding_location = False
+
+def move(direction):
+    for i in range(10):
+        if direction == 'up':
+            for item in cord_list:
+                if cord_list[item] != False:
+                    cord_list[item].move(0,-1)
+        elif direction == 'left':
+            for item in cord_list:
+                if cord_list[item] != False:
+                    cord_list[item].move(-1,0)
+        elif direction == 'down':
+            for item in cord_list.__reversed__():
+                if cord_list[item] != False:
+                    cord_list[item].move(0, 1)
+        elif direction == 'right':
+            for item in cord_list.__reversed__():
+                if cord_list[item] != False:
+                    cord_list[item].move(1, 0)
 
 def draw_board():
     pygame.draw.rect(screen, (200, 200, 200), pygame.Rect(440, 160, 356, 356))
@@ -50,17 +118,47 @@ pygame.display.set_caption("2048 - NO NN")
 clock = pygame.time.Clock()
 screen.fill("grey")
 draw_board()
-
+spawn_block()
 running = True
 while running:
     clock.tick(60)
     pygame.display.flip()
+    pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
-        spawn_block()
+        move('up')
         pygame.time.wait(250)
+        draw_board()
+        for item in cord_list:
+            if cord_list[item] != False:
+                cord_list[item].create_block()
+        spawn_block()
+    elif keys[pygame.K_s]:
+        move('down')
+        pygame.time.wait(250)
+        draw_board()
+        for item in cord_list:
+            if cord_list[item] != False:
+                cord_list[item].create_block()
+        spawn_block()
+    elif keys[pygame.K_d]:
+        move('right')
+        pygame.time.wait(250)
+        draw_board()
+        for item in cord_list:
+            if cord_list[item] != False:
+                cord_list[item].create_block()
+        spawn_block()
+    elif keys[pygame.K_a]:
+        move('left')
+        pygame.time.wait(250)
+        draw_board()
+        for item in cord_list:
+            if cord_list[item] != False:
+                cord_list[item].create_block()
+        spawn_block()
 
 pygame.quit()
