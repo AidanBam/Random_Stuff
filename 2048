@@ -48,18 +48,17 @@ class Block:
         ))
     def move(self, x_change, y_change):
         try:
-            for i in range(4):
-                if not cord_list[self.location[0] + x_change, self.location[1] + y_change]:
-                    place_holder = cord_list[self.location]
-                    cord_list[self.location] = False
-                    self.location = (self.location[0] + x_change, self.location[1] + y_change)
-                    cord_list[self.location] = place_holder
-                elif cord_list[self.location[0] + x_change, self.location[1] + y_change].number == self.number:
-                    self.number += self.number
-                    place_holder = cord_list[self.location]
-                    self.color = color_list.get(self.number)
-                    cord_list[self.location[0], self.location[1]] = place_holder
-                    cord_list[self.location[0] + x_change, self.location[1] + y_change] = False
+            if not cord_list[self.location[0] + x_change, self.location[1] + y_change]:
+                place_holder = cord_list[self.location]
+                cord_list[self.location] = False
+                self.location = (self.location[0] + x_change, self.location[1] + y_change)
+                cord_list[self.location] = place_holder
+            elif cord_list[self.location[0] + x_change, self.location[1] + y_change].number == self.number:
+                self.number += self.number
+                place_holder = cord_list[self.location]
+                self.color = color_list.get(self.number)
+                cord_list[self.location[0], self.location[1]] = place_holder
+                cord_list[self.location[0] + x_change, self.location[1] + y_change] = False
         except:
             pass
 
